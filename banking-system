@@ -1,0 +1,271 @@
+#include<iostream>
+#include<string>
+#include<iomanip>
+#include<cstdlib>
+using namespace std;
+
+struct User {
+    string name;
+    string id;
+    int age,pin;
+    double balance;
+};
+
+// Function to create a user with age rules
+bool createUser(User &user, string name, string id, int age, int pin) {
+
+    // Rule 1: Minimum age
+    if (age < 15) {
+        return false; // account not allowed
+    }
+
+    user.name = name;
+    user.id = id;
+    user.age = age;
+    user.pin = pin;
+
+    // Rule 2: Balance limitation
+    if (age < 20) {
+        user.balance = 100.0;   // limited balance
+    } else {
+        user.balance = 1000.0;  // normal balance
+    }
+
+    return true; // account successfully created
+}
+
+int startMenu(){
+    int option;
+
+    cout<<"==================="<<endl;
+    cout<<left<<setw(11)<<"===Start Up Menu==="<<endl;
+    cout<<"==================="<<endl;
+    cout<<"1. Create an Account."<<endl;
+    cout<<"2. Login an Account."<<endl;
+    cout<<"3. Exit."<<endl;
+    cout<<"Pick your Option: ";
+    cin>>option;
+
+    return option;
+}
+
+bool createAccount(User &user){
+    int age,pin;
+    string name, ID;
+
+    cout<<"========================="<<endl;
+    cout<<left<<setw(11)<<"===Creating an Account==="<<endl;
+    cout<<"========================="<<endl;
+    cout<<"Enter Name: ";
+    cin>>name;
+    cout<<"Enter ID Number: ";
+    cin>>ID;
+    cout<<"Age: ";
+    cin>>age;
+    cout<<"Enter PIN: ";
+    cin>>pin;
+
+    createUser(user, name, ID, age, pin);
+
+    return true;
+
+}
+
+int login(User users[], int userCount){
+    int age,pin;
+    string name, ID;
+
+    cout<<"==========================="<<endl;
+    cout<<left<<setw(11)<<"===Logging in an Account==="<<endl;
+    cout<<"==========================="<<endl;
+    cout<<"Enter Name: ";
+    cin>>name;
+    cout<<"Enter ID Number: ";
+    cin>>ID;
+    cout<<"Age: ";
+    cin>>age;
+    cout<<"PIN: ";
+    cin>>pin;
+
+    for(int i=0; i<userCount; i++){
+        if(users[i].name == name && users[i].id == ID && users[i].age == age && users[i].pin == pin){
+            return i;
+        }
+    }
+
+    return -1;
+
+}
+
+int user(){
+    int option;
+    cout<<"===================="<<endl;
+    cout<<left<<setw(11)<<"===Welcome to ABA==="<<endl;
+    cout<<"===================="<<endl;
+    cout<<left<<setw(11)<<"Thank you for Choosing us"<<endl;
+    cout<<"1. Check Balance."<<endl;
+    cout<<"2. Deposit."<<endl;
+    cout<<"3. Withdrawal."<<endl;
+    cout<<"4. Change PIN."<<endl;
+    cout<<"5. Exit."<<endl;
+    cout<<"Pick your option: ";
+    cin>>option;
+
+    return option;
+    
+}
+
+int balance(User &user){
+    int option;
+    cout<<"==================="<<endl;
+    cout<<left<<setw(11)<<"===Balance==="<<endl;
+    cout<<"Your Balance is: $"<<user.balance<<endl;
+    cout<<"Type 1 to Exit: ";
+    cin>>option;
+    cout<<"==================="<<endl;
+
+    return 0;
+}
+
+int deposite(User &user){
+
+    double deposite;
+    int option;
+
+    cout<<"==================="<<endl;
+    cout<<left<<setw(11)<<"===Deposit==="<<endl;
+    cout<<"How much do you want to Deposit?: $";
+    cin>>deposite;
+    user.balance += deposite;
+    cout<<"Deposit successful! New balance: $"<<user.balance<<endl;
+    cout<<"Type 1 to Exit: ";
+    cin>>option;
+    cout<<"==================="<<endl;
+
+    return 0;
+}
+
+int withdrawal(User &user){
+
+    double withdrawal;
+    int option;
+    cout<<"==================="<<endl;
+    cout<<left<<setw(11)<<"===Withdrawal==="<<endl;
+    cout<<"Your current balance: $"<<user.balance<<endl;
+    cout<<"How much do you want to withdraw?: $";
+    cin>>withdrawal;
+    
+    if(withdrawal > user.balance){
+        cout<<"Insufficient funds!"<<endl;
+    }
+    else{
+        user.balance -= withdrawal;
+        cout<<"Withdrawal successful! New balance: $"<<user.balance<<endl;
+    }
+    
+    cout<<"Type 1 to Exit: ";
+    cin>>option;
+    cout<<"==================="<<endl;
+
+    return 0;
+}
+
+int changePIN(User &user){
+
+    int pin, newpin;
+    bool pinCorrect = false;
+
+    cout<<"==================="<<endl;
+    cout<<left<<setw(11)<<"===Change PIN==="<<endl;
+    cout<<"==================="<<endl;
+
+    do {
+        cout<<"Please type in your current PIN (or 0 to cancel): ";
+        cin>>pin;
+
+        if(pin == 0){ 
+            cout<<"PIN change cancelled."<<endl;
+            break;
+        }
+
+        if(pin == user.pin){
+            pinCorrect = true;
+            cout<<"Please type in your new PIN: ";
+            cin>>newpin;
+            user.pin = newpin;
+            cout<<"New PIN has been successfully changed!"<<endl;
+        }
+        else {
+            cout<<"Wrong PIN! Please try again."<<endl;
+        }
+
+    } while(!pinCorrect && pin != 0);
+
+    cout<<"==================="<<endl;
+
+    return 0;
+}
+
+int main(){
+    int option, bankOption;
+    int loggedInUserIndex = -1;
+    User users[100];
+    int userCount = 0;
+
+    do{
+        option = startMenu();
+        
+        if(option == 1){
+            createAccount(users[userCount]);
+            userCount++;
+            cout<<"Account created successfully!"<<endl;
+        }
+        else if(option == 2){
+            int attempts = 0;
+            int maxAttempts = 3;
+            
+            do {
+                loggedInUserIndex = login(users, userCount);
+                
+                if(loggedInUserIndex != -1){
+            
+                    do{
+                        bankOption = user();
+
+                        if(bankOption == 1){
+                            balance(users[loggedInUserIndex]);
+                        }
+                        else if(bankOption == 2){
+                            deposite(users[loggedInUserIndex]);
+                        }
+                        else if(bankOption == 3){
+                            withdrawal(users[loggedInUserIndex]);
+                        }
+                        else if(bankOption == 4){
+                            changePIN(users[loggedInUserIndex]);
+                        }
+
+                    }while(bankOption != 5);
+                    break;  
+                }
+                else{
+                    attempts++;
+                    if(attempts < maxAttempts){
+                        cout<<"Login failed! Wrong credentials. You have " << (maxAttempts - attempts) << " attempts remaining."<<endl;
+                    }
+                    else{
+                        cout<<"Too many failed attempts. Returning to main menu."<<endl;
+                    }
+                }
+                
+            } while(loggedInUserIndex == -1 && attempts < maxAttempts);
+        }
+        else if(option == 3){
+            cout<<"Thank you for using ABA Banking System!"<<endl;
+            exit(0);
+        }
+
+    }while(option != 3);
+
+    return 0;
+}
